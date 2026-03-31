@@ -58,7 +58,6 @@ class BSODApp:
         self._build_ui()
         self._bind_blockers()
         self.stop_code = random.choice(STOP_CODES)
-        self.pct_var.set("0% complete")
         self.stop_label.config(text=f"Stop code: {self.stop_code}")
         # Start progress in background thread
         t = threading.Thread(target=self._run_progress, daemon=True)
@@ -134,10 +133,9 @@ class BSODApp:
         # ── Percentage line ──────────────────────────────────────────
         pct_y = sub_y + int(H * 0.12)
         pct_size = max(14, int(H * 0.024))
-        self.pct_var = tk.StringVar(value="0% complete")
         self.pct_id = self.canvas.create_text(
             left, pct_y,
-            textvariable=self.pct_var,
+            text="0% complete",
             font=font("Segoe UI", pct_size),
             fill=WHITE, anchor="nw"
         )
@@ -290,7 +288,7 @@ class BSODApp:
         return segments
 
     def _set_pct(self, value: int):
-        self.root.after(0, lambda v=value: self.pct_var.set(f"{v}% complete"))
+        self.root.after(0, lambda v=value: self.canvas.itemconfig(self.pct_id, text=f"{v}% complete"))
 
     # ------------------------------------------------------------------
     # Post-progress repair sequence
@@ -315,7 +313,7 @@ class BSODApp:
         self.root.after(0, self._show_fail_message)
 
     def _hide_progress_ui(self):
-        self.pct_var.set("")
+        self.canvas.itemconfig(self.pct_id, text="")
         self.stop_label.config(text="")
 
     def _set_repair_text(self, msg: str):
@@ -359,4 +357,4 @@ class BSODApp:
 
 if __name__ == "__main__":
     BSODApp()
-      
+        
